@@ -44,9 +44,9 @@ body{
 .brand{display:flex;gap:4px 12px;align-items:baseline;flex-wrap:wrap}
 .brand b{font-family:var(--f-display);font-weight:500;font-size:18px;letter-spacing:.01em}
 .brand span{font-family:var(--f-mono);font-size:11px;color:var(--muted);letter-spacing:.08em}
-.rail{display:flex;gap:4px}
 .top .brand b{color:#e8eef2}
 .top .brand span,.top .credit,.top .credit a{color:#9aa7b0}
+.rail{display:flex;gap:4px}
 .credit{margin:0;font-size:10.5px;line-height:1.4;color:var(--muted)}
 .credit a{color:var(--muted);text-decoration:underline}
 .credit a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -96,6 +96,12 @@ body{
 .rec-exit{display:none;position:fixed;top:max(8px,env(safe-area-inset-top,0px));right:max(8px,env(safe-area-inset-right,0px));z-index:6;opacity:0;cursor:pointer;font:500 12px var(--f-body);padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink)}
 .rec-exit:hover,.rec-exit:focus-visible{opacity:1}
 body.rec .rec-exit{display:block}
+.rec-next{display:none;position:fixed;right:max(14px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);z-index:6;width:56px;height:56px;padding:0;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.6);color:var(--ink);opacity:.6;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rec-next:active{opacity:1}
+@media (hover:none) and (pointer:coarse){
+  body.rec .rec-next{display:flex}
+  body.rec .rec-exit{opacity:.55}
+}
 body.rec .top,body.rec .controls{display:none}
 body.rec{cursor:none}
 body.rec .rec-exit{cursor:pointer}
@@ -147,6 +153,7 @@ body.rec .rec-exit{cursor:pointer}
     </div>
   </section>
 </div>
+<button id="recNext" class="rec-next" type="button" aria-label="ขั้นตอนต่อไป"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
 <button id="recExit" class="rec-exit" type="button" aria-label="ออกจากโหมดอัดวิดีโอ">ออก (Esc)</button>
 <div class="fail" id="fail" hidden>เบราว์เซอร์นี้เปิดกราฟิก 3D (WebGL) ไม่ได้ ลองใช้ Chrome หรือ Edge รุ่นใหม่</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -298,7 +305,8 @@ var SEG=SEGP.map(curveOf);
 var stageEl=$('stage');
 var renderer;
 try{renderer=new T.WebGLRenderer({antialias:true,alpha:true});}catch(e){showFail();return;}
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+var coarse=!!(window.matchMedia&&window.matchMedia('(pointer: coarse)').matches);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,coarse?1.5:2));
 renderer.setClearColor(0x000000,0);
 stageEl.appendChild(renderer.domElement);
 var scene=new T.Scene();
@@ -425,14 +433,14 @@ var dropCore=new T.Mesh(new T.SphereGeometry(0.1,20,16),new T.MeshBasicMaterial(
 dropCore.renderOrder=21;
 drop.add(dropHalo);drop.add(dropCore);drop.visible=false;world.add(drop);
 
-var TN=70,tpos=new Float32Array(TN*3),talpha=new Float32Array(TN),hist=[];
+var TN=140,tpos=new Float32Array(TN*3),talpha=new Float32Array(TN),hist=[];
 var tg=new T.BufferGeometry();
 tg.setAttribute('position',new T.BufferAttribute(tpos,3));
 tg.setAttribute('aA',new T.BufferAttribute(talpha,1));
 var trailMat=new T.ShaderMaterial({
   uniforms:{uC:{value:dropColor},uS:{value:400},uM:{value:26}},
   vertexShader:'attribute float aA;varying float vA;uniform float uS;uniform float uM;void main(){vA=aA;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=clamp(aA*uS/(-mv.z),1.0,uM);gl_Position=projectionMatrix*mv;}',
-  fragmentShader:'uniform vec3 uC;varying float vA;void main(){float d=length(gl_PointCoord-0.5);float a=smoothstep(0.5,0.05,d)*vA;gl_FragColor=vec4(uC,a*0.8);}',
+  fragmentShader:'uniform vec3 uC;varying float vA;void main(){float d=length(gl_PointCoord-0.5);float a=(1.0-smoothstep(0.05,0.5,d))*vA;gl_FragColor=vec4(uC,a*0.55);}',
   transparent:true,depthWrite:false,depthTest:false
 });
 var trail=new T.Points(tg,trailMat);
@@ -549,7 +557,7 @@ pg.setAttribute('aS',new T.BufferAttribute(psz,1));
 var pmat=new T.ShaderMaterial({
   uniforms:{uS:{value:400},uK:{value:1}},
   vertexShader:'attribute vec3 aC;attribute float aA;attribute float aS;varying vec3 vC;varying float vA;uniform float uS;uniform float uK;void main(){vC=aC;vA=aA;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=max(1.0,aS*uK*uS/(-mv.z));gl_Position=projectionMatrix*mv;}',
-  fragmentShader:'varying vec3 vC;varying float vA;void main(){float d=length(gl_PointCoord-0.5);float a=smoothstep(0.5,0.35,d)*vA;gl_FragColor=vec4(vC,a);}',
+  fragmentShader:'varying vec3 vC;varying float vA;void main(){float d=length(gl_PointCoord-0.5);float a=(1.0-smoothstep(0.35,0.5,d))*vA;gl_FragColor=vec4(vC,a);}',
   transparent:true,depthWrite:false
 });
 var pnts=new T.Points(pg,pmat);pnts.frustumCulled=false;pnts.renderOrder=15;neph.add(pnts);
@@ -785,11 +793,12 @@ window.addEventListener('keydown',function(e){
   if(e.key==='ArrowRight'){btnNext.click();}
   else if(e.key==='ArrowLeft'&&!btnPrev.disabled){btnPrev.click();}
   else if(e.key==='Escape'&&recFlag){recOff();}
+  else if((e.key===' '||e.key==='Enter')&&recFlag){e.preventDefault();advance();}
 });
 var px=0,py=0,tx=0,ty=0;
 
 /* recording mode: only the body and the card stay on screen, and the tour plays from the start */
-var btnRec=$('rec'),btnRecExit=$('recExit'),recFlag=false,recT=0;
+var btnRec=$('rec'),btnRecExit=$('recExit'),btnRecNext=$('recNext'),recFlag=false,recT=0;
 function fsEnter(){
   try{var el=document.documentElement;if(el&&el.requestFullscreen){var p=el.requestFullscreen();if(p&&p.catch)p.catch(function(){});}}catch(e){}
 }
@@ -820,6 +829,7 @@ function recOff(){
 }
 btnRec.addEventListener('click',recOn);
 btnRecExit.addEventListener('click',recOff);
+btnRecNext.addEventListener('click',function(){advance();});
 if(document.addEventListener)document.addEventListener('fullscreenchange',function(){
   if(recFlag&&!document.fullscreenElement)recOff();
 });
@@ -840,7 +850,7 @@ function resize(){
   else if(w>=860){camera.setViewOffset(w,h,-w*0.14,0,w,h);}
   else{camera.clearViewOffset();}
   camera.updateProjectionMatrix();
-  trailMat.uniforms.uS.value=h*1.45*0.2*renderer.getPixelRatio();
+  trailMat.uniforms.uS.value=h*1.45*0.14*renderer.getPixelRatio();
   trailMat.uniforms.uM.value=26*renderer.getPixelRatio();
   pmat.uniforms.uS.value=h*1.45*renderer.getPixelRatio();
 }
@@ -893,7 +903,16 @@ function frame(){
   /* keep the drop a sensible size on screen when the camera is close */
   drop.scale.setScalar((1+Math.sin(now*5)*0.1)*Math.max(0.3,Math.min(1,camPos.distanceTo(dropPos)/7)));
   if(drop.visible){
-    if(!hist.length||hist[0].distanceToSquared(dropPos)>0.0016){hist.unshift(dropPos.clone());if(hist.length>TN)hist.pop();}
+    /* add points at a fixed spacing along the path, so a slow frame rate (iPad) leaves no gaps in the stream */
+    if(!hist.length)hist.unshift(dropPos.clone());
+    else{
+      var from=hist[0].clone(),gap=from.distanceTo(dropPos);
+      if(gap>0.02){
+        var cnt=Math.min(60,Math.floor(gap/0.02));
+        for(var qi=1;qi<=cnt;qi++)hist.unshift(from.clone().lerp(dropPos,qi/cnt));
+        while(hist.length>TN)hist.pop();
+      }
+    }
     for(var i=0;i<TN;i++){
       var p=i<hist.length?hist[i]:dropPos;
       tpos[i*3]=p.x;tpos[i*3+1]=p.y;tpos[i*3+2]=p.z;

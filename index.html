@@ -103,6 +103,40 @@ body.rec .rec-next:hover{opacity:1}
 @media (hover:none) and (pointer:coarse){
   body.rec .rec-exit{opacity:.55}
 }
+
+.quiz-open{margin-left:auto}
+.quiz [hidden],.quiz[hidden]{display:none!important}
+#qMain{display:flex;flex-direction:column;gap:18px}
+.quiz{position:fixed;inset:0;z-index:9;overflow-y:auto;background:radial-gradient(110% 85% at 50% 20%,#262a30 0%,#14171a 60%,#0d0f12 100%);color:#e8eef2;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 32px max(16px,env(safe-area-inset-left,0px))}
+.quiz-in{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.qhead{display:flex;align-items:center;gap:14px}
+.qprog{font:500 13px var(--f-mono);color:#9aa7b0;white-space:nowrap}
+.qbar{flex:1;height:6px;border-radius:3px;background:#2c3238;overflow:hidden}
+.qbar i{display:block;height:100%;width:0;background:#4db3e6;transition:width .4s}
+.qclose{font:500 13px var(--f-body);padding:6px 14px;border-radius:8px;border:1px solid #3a424a;background:transparent;color:#e8eef2;cursor:pointer;min-height:36px}
+.qtext{font-family:var(--f-display);font-weight:500;font-size:clamp(22px,3.6vw,40px);line-height:1.4;margin:10px 0 4px;text-wrap:balance}
+.qopts{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:860px){.qopts{grid-template-columns:1fr 1fr}}
+.qopt{display:flex;align-items:center;gap:14px;text-align:left;min-height:68px;padding:12px 16px;border-radius:14px;border:2px solid #3a424a;background:#1b1f23;color:#e8eef2;font:500 clamp(16px,2.2vw,24px)/1.4 var(--f-body);cursor:pointer;transition:border-color .2s,background .2s,opacity .2s}
+.qopt:hover:not(:disabled){border-color:#4db3e6;background:#20262b}
+.qopt:disabled{cursor:default}
+.qopt .qn{flex:none;width:38px;height:38px;border-radius:50%;background:#2c3238;display:grid;place-items:center;font:600 18px var(--f-body)}
+.qopt.right{border-color:#3fbf7f;background:#143324}
+.qopt.right .qn{background:#3fbf7f;color:#08210f}
+.qopt.wrong{border-color:#ef6b6b;background:#3a1b1b}
+.qopt.wrong .qn{background:#ef6b6b;color:#2a0808}
+.qopt.dim{opacity:.45}
+.qfb{border-radius:14px;padding:16px 20px;font-size:clamp(15px,1.9vw,21px);line-height:1.65}
+.qfb p{margin:6px 0 0}
+.qfb strong{font:600 clamp(18px,2.4vw,26px) var(--f-display)}
+.qfb.good{background:#143324;border:1px solid #3fbf7f}
+.qfb.bad{background:#2d2020;border:1px solid #ef6b6b}
+.qbtn{align-self:flex-end;font:600 clamp(16px,2vw,20px) var(--f-body);min-height:52px;padding:10px 28px;border-radius:12px;border:0;background:#4db3e6;color:#06222f;cursor:pointer}
+.qbtn.ghost{background:transparent;border:1px solid #3a424a;color:#e8eef2}
+.qres{text-align:center;display:flex;flex-direction:column;gap:18px;align-items:center;padding-top:6vh}
+.qscore{font:500 clamp(56px,12vw,120px)/1 var(--f-display);color:#4db3e6}
+.qres .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+body.quizOn{overflow:hidden}
 body.rec .top,body.rec .controls{display:none}
 body.rec{cursor:none}
 body.rec .rec-exit{cursor:pointer}
@@ -134,6 +168,7 @@ body.rec .rec-exit{cursor:pointer}
   <header class="top">
     <div class="top-row">
       <div class="brand"><b>เส้นทางของน้ำ</b><span>ระบบขับถ่ายปัสสาวะ</span></div>
+      <button id="quizOpen" class="btn small quiz-open" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>แบบฝึกหัด</button>
       <button id="rec" class="btn small" type="button" title="ซ่อนปุ่มและแถบ เหลือแต่ตัวคนกับการ์ด แล้วเล่นตั้งแต่ต้นจนจบ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 7l-7 5 7 5z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>อัดวิดีโอ</button>
     </div>
     <nav class="rail" id="rail" aria-label="ขั้นตอนการเดินทางของน้ำ"></nav>
@@ -156,6 +191,11 @@ body.rec .rec-exit{cursor:pointer}
 </div>
 <button id="recNext" class="rec-next" type="button" aria-label="ขั้นตอนต่อไป"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
 <button id="recExit" class="rec-exit" type="button" aria-label="ออกจากโหมดอัดวิดีโอ">ออก (Esc)</button>
+<section id="quiz" class="quiz" hidden aria-label="แบบฝึกหัด"><div class="quiz-in">
+  <div class="qhead"><span class="qprog" id="qProg"></span><div class="qbar"><i id="qBar"></i></div><button id="qClose" class="qclose" type="button">ปิด (Esc)</button></div>
+  <div id="qMain"><h2 class="qtext" id="qText"></h2><div class="qopts" id="qOpts"></div><div class="qfb" id="qFb" hidden aria-live="polite"></div><button id="qNext" class="qbtn" type="button" hidden>ข้อถัดไป</button></div>
+  <div id="qRes" class="qres" hidden><div>คะแนนของคุณ</div><div class="qscore" id="qScore"></div><div class="row"><button id="qAgain" class="qbtn ghost" type="button">ทำใหม่</button><button id="qDone" class="qbtn" type="button">กลับไปดูโมเดล</button></div></div>
+</div></section>
 <div class="fail" id="fail" hidden>เบราว์เซอร์นี้เปิดกราฟิก 3D (WebGL) ไม่ได้ ลองใช้ Chrome หรือ Edge รุ่นใหม่</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -954,6 +994,131 @@ resize();
 var f0=frameOf(-1);camera.position.copy(f0.pos);camera.lookAt(f0.look);
 setCard(-1);syncUI();
 frame();
+})();
+</script>
+<script>
+(function(){
+var Q=[
+{q:'น้ำที่เราดื่มเข้าไป ขบวนการเดินทางเพื่อเปลี่ยนเป็นปัสสาวะจะต้องผ่านระบบใดเป็นลำดับแรกก่อนเข้าสู่ระบบขับถ่ายปัสสาวะ?',
+ o:[
+  {t:'ระบบหายใจ → ระบบไหลเวียนเลือด',w:'ระบบหายใจพาอากาศเข้าสู่ปอด ไม่ใช่เส้นทางที่น้ำเข้าสู่ร่างกาย'},
+  {t:'ระบบย่อยอาหาร → ระบบไหลเวียนเลือด',ok:1,w:'น้ำเข้าทางปาก ผ่านทางเดินอาหาร ถูกดูดซึมเข้ากระแสเลือด แล้วจึงไปรับการกรองที่ไต'},
+  {t:'ระบบประสาท → ระบบขับถ่าย',w:'ระบบประสาทส่งสัญญาณควบคุมร่างกาย น้ำไม่ได้เดินทางผ่านระบบนี้'},
+  {t:'ระบบต่อมไร้ท่อ → ระบบย่อยอาหาร',w:'ต่อมไร้ท่อสร้างฮอร์โมน น้ำไม่ได้ผ่านระบบนี้ และลำดับก็กลับด้าน เพราะน้ำต้องผ่านการย่อยอาหารก่อน'}],
+ ord:[0,2,3,1]},
+{q:'ขณะที่เราดื่มน้ำ ทำไมน้ำถึงไม่ไหลลงไปในปอด?',
+ o:[
+  {t:'เพราะมีกล้ามเนื้อหูรูดคอยกั้นหลอดลม',w:'สิ่งที่ปิดทางเข้าหลอดลมคือฝาปิดกล่องเสียง ไม่ใช่กล้ามเนื้อหูรูด'},
+  {t:'เพราะหลอดลมปิดตัวลงอัตโนมัติ',w:'หลอดลมไม่ได้ปิดเอง แต่มีฝาปิดกล่องเสียงลงมาปิดทางเข้าไว้'},
+  {t:'เพราะมีฝาปิดกล่องเสียง (Epiglottis) ปิดทางเข้าหลอดลม',ok:1,w:'ฝาปิดกล่องเสียง (Epiglottis) ปิดทางเข้าหลอดลมชั่วขณะตอนกลืน น้ำจึงไหลลงหลอดอาหารแทน'},
+  {t:'เพราะน้ำมีความหนืดสูงจึงไม่ไหลเข้าหลอดลม',w:'น้ำไม่ได้หนืด และการไม่เข้าปอดก็ไม่เกี่ยวกับความหนืด แต่เกิดจากฝาปิดกล่องเสียง'}],
+ ord:[0,1,2,3]},
+{q:'อวัยวะใดทำหน้าที่หลักในการดูดซึมน้ำส่วนใหญ่เข้าสู่กระแสเลือด และมีโครงสร้างใดช่วยเพิ่มพื้นที่ผิวดูดซึม?',
+ o:[
+  {t:'กระเพาะอาหาร / มีต่อมน้ำย่อย',w:'กระเพาะหลั่งน้ำย่อย และน้ำผ่านกระเพาะไปค่อนข้างเร็ว ไม่ใช่ที่ดูดซึมน้ำส่วนใหญ่'},
+  {t:'ลำไส้เล็ก / มีวิลไล (Villi)',ok:1,w:'น้ำส่วนใหญ่ถูกดูดซึมที่ลำไส้เล็ก ผนังด้านในมีวิลไล (Villi) จำนวนมากช่วยเพิ่มพื้นที่ดูดซึม'},
+  {t:'ลำไส้ใหญ่ / มีเมือกเคลือบ',w:'น้ำส่วนใหญ่ถูกดูดซึมที่ลำไส้เล็กไปแล้ว และเมือกไม่ได้ช่วยเพิ่มพื้นที่ผิวดูดซึม'},
+  {t:'ตับ / มีท่อน้ำดี',w:'ตับสร้างน้ำดี ไม่ได้ทำหน้าที่ดูดซึมน้ำเข้าสู่กระแสเลือด'}],
+ ord:[1,0,2,3]},
+{q:'เลือดที่หัวใจสูบฉีดออกไปทั่วร่างกาย ถูกส่งมาที่ "ไต" คิดเป็นสัดส่วนประมาณเท่าไร?',
+ o:[
+  {t:'1 ใน 2 ของเลือดทั้งหมด',w:'มากเกินไป ไตได้รับเลือดแค่ประมาณ 1 ใน 5'},
+  {t:'1 ใน 5 ของเลือดทั้งหมด',ok:1,w:'ไตได้รับเลือดประมาณ 20% หรือ 1 ใน 5 ของเลือดที่หัวใจสูบออก เพราะต้องกรองเลือดตลอดเวลา'},
+  {t:'1 ใน 10 ของเลือดทั้งหมด',w:'น้อยเกินไป ไตได้รับเลือดมากกว่านี้ คือประมาณ 1 ใน 5'},
+  {t:'1 ใน 20 ของเลือดทั้งหมด',w:'น้อยเกินไป ไตได้รับเลือดมากกว่านี้ คือประมาณ 1 ใน 5'}],
+ ord:[0,1,2,3]},
+{q:'ใน 1 วัน ไตกรองของเหลวออกจากเลือดมากถึง 180 ลิตร แต่ทำไมเราถึงขับถ่ายปัสสาวะออกมาแค่ 1–2 ลิตรเท่านั้น?',
+ o:[
+  {t:'เพราะร่างกายนำน้ำไปใช้สร้างกล้ามเนื้อหมด',w:'ร่างกายใช้น้ำส่วนหนึ่งจริง แต่ไม่ถึงระดับที่หายไปเกือบ 180 ลิตรต่อวัน'},
+  {t:'เพราะเกิดการดูดกลับ (Reabsorption) ที่หน่วยไต (Nephron) ดึงน้ำกลับเข้าเลือด',ok:1,w:'ท่อของหน่วยไต (Nephron) ดูดน้ำและสารที่ร่างกายยังต้องใช้กลับเข้าเลือดราว 99% จึงเหลือเป็นปัสสาวะแค่ 1–2 ลิตร'},
+  {t:'เพราะน้ำระเหยออกทางผิวหนังและปอดเกือบหมด',w:'น้ำระเหยทางผิวหนังและปอดได้บ้าง แต่ไม่ใช่ปริมาณมากขนาดนี้ น้ำที่กรองถูกดูดกลับเข้าเลือดที่ไต'},
+  {t:'เพราะของเหลวส่วนใหญ่ถูกขับออกทางอุจจาระแทน',w:'ไตกรองจากเลือด ไม่ใช่จากทางเดินอาหาร ของเหลวที่กรองไม่ได้ไปออกทางอุจจาระ'}],
+ ord:[2,0,1,3]},
+{q:'โดยปกติแล้ว มนุษย์เราจะเริ่มรู้สึก "ปวดปัสสาวะ" เมื่อกระเพาะปัสสาวะมีน้ำปัสสาวะสะสมอยู่ประมาณเท่าไร?',
+ o:[
+  {t:'50 – 100 มิลลิลิตร',w:'น้อยเกินไป ปริมาณนี้ยังไม่ทำให้รู้สึกปวด'},
+  {t:'200 – 300 มิลลิลิตร',ok:1,w:'กระเพาะปัสสาวะเริ่มส่งสัญญาณปวดเมื่อมีปัสสาวะราว 200–300 มล. (จุสูงสุดได้ราว 400–600 มล.)'},
+  {t:'400 – 600 มิลลิลิตร',w:'ตัวเลขนี้คือความจุสูงสุดโดยประมาณ ไม่ใช่จุดที่เริ่มรู้สึกปวด'},
+  {t:'800 – 1,000 มิลลิลิตร',w:'เกินความจุปกติของกระเพาะปัสสาวะ'}],
+ ord:[0,1,2,3]},
+{q:'ข้อใดต่อไปนี้ถูกต้องเกี่ยวกับความยาวของท่อปัสสาวะ (Urethra) ในเพศชายและเพศหญิง?',
+ o:[
+  {t:'ผู้หญิงยาวกว่าผู้ชาย (ประมาณ 20 ซม.)',w:'กลับกัน ผู้ชายต่างหากที่ยาวกว่า'},
+  {t:'ผู้ชายยาวกว่าผู้หญิง (ชาย ~20 ซม. / หญิง ~4 ซม.)',ok:1,w:'ท่อปัสสาวะผู้ชายยาวประมาณ 20 ซม. ส่วนผู้หญิงยาวประมาณ 4 ซม.'},
+  {t:'ทั้งสองเพศมีความยาวเท่ากัน (ประมาณ 10 ซม.)',w:'ความยาวไม่เท่ากัน ผู้ชายประมาณ 20 ซม. ผู้หญิงประมาณ 4 ซม.'},
+  {t:'ความยาวขึ้นอยู่กับปริมาณน้ำที่ดื่มในแต่ละวัน',w:'ความยาวเป็นโครงสร้างของร่างกาย ไม่เปลี่ยนตามปริมาณน้ำที่ดื่ม'}],
+ ord:[1,0,2,3]}
+];
+/* ord = original option indexes in display order */
+var TH=['ก','ข','ค','ง'];
+var root=document.getElementById('quiz');
+if(!root)return;
+var elProg=document.getElementById('qProg'),elBar=document.getElementById('qBar'),elQ=document.getElementById('qText'),
+    elOpts=document.getElementById('qOpts'),elFb=document.getElementById('qFb'),elNext=document.getElementById('qNext'),
+    elMain=document.getElementById('qMain'),elRes=document.getElementById('qRes'),elScore=document.getElementById('qScore'),
+    btnOpen=document.getElementById('quizOpen'),btnClose=document.getElementById('qClose'),btnAgain=document.getElementById('qAgain'),btnDone=document.getElementById('qDone');
+var idx=0,score=0,answered=false,opened=false;
+function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
+function show(i){
+  idx=i;answered=false;
+  var q=Q[i];
+  elMain.hidden=false;elRes.hidden=true;
+  elProg.textContent='ข้อ '+(i+1)+' จาก '+Q.length;
+  elBar.style.width=(i/Q.length*100)+'%';
+  elQ.textContent=q.q;
+  elOpts.textContent='';elFb.textContent='';elFb.hidden=true;elNext.hidden=true;
+  q.ord.forEach(function(oi,pos){
+    var o=q.o[oi],b=el('button','qopt');
+    b.type='button';b.dataset.i=oi;
+    b.appendChild(el('span','qn',TH[pos]));b.appendChild(el('span','qt',o.t));
+    b.addEventListener('click',function(){pick(pos);});
+    elOpts.appendChild(b);
+  });
+}
+function pick(pos){
+  if(answered)return;answered=true;
+  var q=Q[idx],oi=q.ord[pos],o=q.o[oi],good=!!o.ok;
+  if(good)score++;
+  var okPos=0;
+  Array.prototype.forEach.call(elOpts.children,function(b,p){
+    b.disabled=true;
+    var isOk=!!q.o[q.ord[p]].ok;
+    if(isOk){b.classList.add('right');b.querySelector('.qn').textContent='✓';okPos=p;}
+    if(p===pos&&!good){b.classList.add('wrong');b.querySelector('.qn').textContent='✗';}
+    if(!isOk&&p!==pos)b.classList.add('dim');
+  });
+  elFb.textContent='';
+  elFb.className='qfb '+(good?'good':'bad');
+  elFb.appendChild(el('strong',null,good?'ถูกต้อง':'ยังไม่ถูก'));
+  if(good){elFb.appendChild(el('p',null,'ถูกเพราะ '+o.w));}
+  else{
+    elFb.appendChild(el('p',null,'ข้อ '+TH[pos]+' ผิดเพราะ '+o.w));
+    var c=q.o[q.ord[okPos]];
+    elFb.appendChild(el('p',null,'คำตอบที่ถูกคือข้อ '+TH[okPos]+' เพราะ '+c.w));
+  }
+  elFb.hidden=false;
+  elNext.textContent=idx===Q.length-1?'ดูคะแนน':'ข้อถัดไป';elNext.hidden=false;
+  try{elNext.focus({preventScroll:true});}catch(e){}
+}
+function finish(){
+  elMain.hidden=true;elRes.hidden=false;
+  elBar.style.width='100%';elProg.textContent='เสร็จแล้ว';
+  elScore.textContent=score+' / '+Q.length;
+}
+function next(){if(!answered)return;if(idx===Q.length-1)finish();else show(idx+1);}
+function open(){opened=true;root.hidden=false;document.body.classList.add('quizOn');idx=0;score=0;show(0);}
+function close(){opened=false;root.hidden=true;document.body.classList.remove('quizOn');}
+btnOpen.addEventListener('click',open);
+btnClose.addEventListener('click',close);btnDone.addEventListener('click',close);
+btnAgain.addEventListener('click',function(){idx=0;score=0;show(0);});
+elNext.addEventListener('click',next);
+window.addEventListener('keydown',function(e){
+  if(!opened)return;
+  e.stopPropagation();
+  if(e.key==='Escape')close();
+  else if(e.key>='1'&&e.key<='4'&&!answered&&!elMain.hidden)pick(+e.key-1);
+  else if((e.key==='ArrowRight'||e.key==='Enter')&&answered&&!elMain.hidden){e.preventDefault();next();}
+},true);
 })();
 </script>
 

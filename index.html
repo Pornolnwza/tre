@@ -79,6 +79,7 @@ body{
 .subs strong{display:block;font-weight:600;line-height:1.4}
 .subs em{font:400 11px var(--f-mono);font-style:normal;color:var(--muted);margin-left:6px}
 .subs span{display:block;color:#25485a;font-size:13px;line-height:1.55}
+.fact:empty{display:none}
 .fact{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-family:var(--f-mono);font-size:12px;line-height:1.6;color:var(--amber)}
 .controls{pointer-events:auto;display:flex;gap:8px}
 .btn{
@@ -93,7 +94,7 @@ body{
 .btn.primary:hover:not(:disabled){background:#0b74aa}
 .btn:disabled{opacity:.4;cursor:default}
 .btn.small{min-height:36px;padding:4px 12px;font-size:13px;display:inline-flex;align-items:center;gap:6px}
-.rec-exit{display:none;position:fixed;top:max(8px,env(safe-area-inset-top,0px));right:max(8px,env(safe-area-inset-right,0px));z-index:6;opacity:0;cursor:pointer;font:500 12px var(--f-body);padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.rec-exit{display:none;position:fixed;top:max(8px,env(safe-area-inset-top,0px));right:max(8px,env(safe-area-inset-right,0px));z-index:6;opacity:.85;cursor:pointer;font:600 14px var(--f-body);padding:8px 16px;min-height:40px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink)}
 .rec-exit:hover,.rec-exit:focus-visible{opacity:1}
 body.rec .rec-exit{display:block}
 .rec-next{display:none;position:fixed;right:max(14px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);z-index:6;width:56px;height:56px;padding:0;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.6);color:var(--ink);opacity:.6;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -101,10 +102,19 @@ body.rec .rec-exit{display:block}
 body.rec .rec-next{display:flex}
 body.rec .rec-next:hover{opacity:1}
 @media (hover:none) and (pointer:coarse){
-  body.rec .rec-exit{opacity:.55}
 }
 
 .quiz-open{margin-left:auto}
+#memOpen{margin-left:auto}
+#memOpen+.quiz-open{margin-left:0}
+.mem[hidden]{display:none!important}
+.mem{position:fixed;inset:0;z-index:9;display:grid;place-items:center;padding:16px;background:rgba(8,10,12,.72)}
+.mem-in{width:min(520px,100%);background:#1b1f23;color:#e8eef2;border:1px solid #3a424a;border-radius:16px;padding:22px 24px 24px}
+.mem-in h2{font:500 24px var(--f-display);margin:0 0 4px}
+.mem-in .sub{font:400 12px var(--f-mono);color:#9aa7b0;margin:0 0 14px}
+.mem-in ul{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-direction:column;gap:8px}
+.mem-in li{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-radius:10px;background:#242a2f;font-size:16px}
+.mem-in li span{font:500 13px var(--f-mono);color:#4db3e6;white-space:nowrap}
 .quiz [hidden],.quiz[hidden]{display:none!important}
 #qMain{display:flex;flex-direction:column;gap:18px}
 .quiz{position:fixed;inset:0;z-index:9;overflow-y:auto;background:radial-gradient(110% 85% at 50% 20%,#262a30 0%,#14171a 60%,#0d0f12 100%);color:#e8eef2;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 32px max(16px,env(safe-area-inset-left,0px))}
@@ -151,10 +161,25 @@ body.rec .rec-exit{cursor:pointer}
 .fail{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--bg-a);color:var(--ink)}
 @media (min-width:860px){
   body{padding-block:16px}
-  .bottom{width:min(440px,100%)}
-  .card{padding:18px 20px 20px;max-height:min(66vh,600px)}
-  .card h2{font-size:26px}
-  .card p{font-size:15px}
+  .bottom{width:min(520px,100%)}
+  .card{padding:20px 24px 22px;max-height:min(66vh,640px)}
+  .card h2{font-size:30px}
+  .card p{font-size:17px}
+  .subs span{font-size:15px}
+  .fact{font-size:13px}
+  body.rec .bottom{width:min(640px,100%)}
+  body.rec .card{padding:26px 30px 28px;max-height:min(78vh,780px)}
+  body.rec .kicker{font-size:14px}
+  body.rec .card h2{font-size:clamp(32px,3.2vw,46px)}
+  body.rec .card p{font-size:clamp(19px,1.9vw,26px);max-width:none}
+  body.rec .subs span{font-size:clamp(16px,1.6vw,21px)}
+  body.rec .subs strong{font-size:clamp(17px,1.7vw,22px)}
+  body.rec .fact{font-size:clamp(14px,1.4vw,18px)}
+}
+@media (max-width:859px){
+  body.rec .card h2{font-size:26px}
+  body.rec .card p{font-size:18px}
+  body.rec .card{max-height:56vh}
 }
 @media (prefers-reduced-motion:reduce){
   .card,.tag{transition:none}
@@ -168,8 +193,9 @@ body.rec .rec-exit{cursor:pointer}
   <header class="top">
     <div class="top-row">
       <div class="brand"><b>เส้นทางของน้ำ</b><span>ระบบขับถ่ายปัสสาวะ</span></div>
+      <button id="memOpen" class="btn small quiz-open" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>สมาชิก</button>
       <button id="quizOpen" class="btn small quiz-open" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>แบบฝึกหัด</button>
-      <button id="rec" class="btn small" type="button" title="ซ่อนปุ่มและแถบ เหลือแต่ตัวคนกับการ์ด แล้วเล่นตั้งแต่ต้นจนจบ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 7l-7 5 7 5z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>อัดวิดีโอ</button>
+      <button id="rec" class="btn small" type="button" title="ซ่อนปุ่มและแถบ เหลือแต่ตัวคนกับการ์ด แล้วเล่นตั้งแต่ต้นจนจบ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 7l-7 5 7 5z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>กล้อง</button>
     </div>
     <nav class="rail" id="rail" aria-label="ขั้นตอนการเดินทางของน้ำ"></nav>
     <p class="credit">โมเดลร่างกาย <a href="https://sketchfab.com/3d-models/low-poly-male-body-base-c6c3dd15792c4b768f087f0831ad249d" target="_blank" rel="noopener">Low Poly Male Body Base</a> โดย Mesh-Base ใช้ภายใต้ <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></p>
@@ -191,6 +217,7 @@ body.rec .rec-exit{cursor:pointer}
 </div>
 <button id="recNext" class="rec-next" type="button" aria-label="ขั้นตอนต่อไป"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
 <button id="recExit" class="rec-exit" type="button" aria-label="ออกจากโหมดอัดวิดีโอ">ออก (Esc)</button>
+<div id="mem" class="mem" hidden role="dialog" aria-label="สมาชิก"><div class="mem-in"><h2>สมาชิก</h2><p class="sub">ชั้น ม.5/12</p><ul><li>นายกิตติ์ธนทัต คงถนอม<span>เลขที่ 1</span></li><li>นายชนะชัย แสงลี<span>เลขที่ 3</span></li><li>นายชิณณพัฒน์ ภักดีเจริญ<span>เลขที่ 4</span></li><li>นายญาณวุฒิ บุญยงค์<span>เลขที่ 5</span></li><li>นายนรวัฒน์ ทองเหลือง<span>เลขที่ 10</span></li></ul><button id="memClose" class="qbtn" type="button">ปิด</button></div></div>
 <section id="quiz" class="quiz" hidden aria-label="แบบฝึกหัด"><div class="quiz-in">
   <div class="qhead"><span class="qprog" id="qProg"></span><div class="qbar"><i id="qBar"></i></div><button id="qClose" class="qclose" type="button">ปิด (Esc)</button></div>
   <div id="qMain"><h2 class="qtext" id="qText"></h2><div class="qopts" id="qOpts"></div><div class="qfb" id="qFb" hidden aria-live="polite"></div><button id="qNext" class="qbtn" type="button" hidden>ข้อถัดไป</button></div>
@@ -260,8 +287,8 @@ var STOPS=[
  {en:'Urethra',th:'ท่อปัสสาวะ',col:CU,look:[0,2.5,0.5],cam:[1.9,2.6,3.2],tag:[0.0,2.5,0.55],
   body:'เมื่อพร้อมขับออก กล้ามเนื้อกระเพาะปัสสาวะบีบตัวและหูรูดคลายตัว ปัสสาวะไหลออกทางท่อปัสสาวะ',
   fact:'ผู้หญิงยาวราว 4 ซม. ผู้ชายยาวราว 20 ซม.'},
- {en:'Summary',th:'ออกจากร่างกายแล้ว',col:CU,look:[0,4.6,0.5],cam:[2.6,5.0,13.2],tag:null,
-  body:'ปาก, หลอดอาหาร, กระเพาะ, ลำไส้เล็ก, กระแสเลือด, ไต, ท่อไต, กระเพาะปัสสาวะ, ท่อปัสสาวะ น้ำที่ดื่มไม่ได้ลงไปที่กระเพาะปัสสาวะโดยตรง แต่ต้องเข้าเลือดและผ่านการกรองที่ไตก่อน',
+ {en:'',th:'เส้นทางของน้ำหนึ่งหยด',col:CU,look:[0,4.6,0.5],cam:[2.6,5.0,13.2],tag:null,
+  body:'น้ำเข้าทางปาก ผ่านหลอดอาหารและกระเพาะ ถูกดูดซึมที่ลำไส้เล็กเข้าสู่กระแสเลือด แล้วไหลมากรองที่ไต ปัสสาวะที่ได้ไหลผ่านท่อไตลงกระเพาะปัสสาวะ และออกทางท่อปัสสาวะ',
   fact:'น้ำเปลี่ยนจากน้ำดื่มเป็นปัสสาวะที่ไต'}
 ];
 var N=STOPS.length;
@@ -401,17 +428,6 @@ function add(geo,mat,stops,o){
   organs.push({m:m,mat:mat,stops:stops,foc:o.foc==null?0.8:o.foc,fixed:o.fixed});
   return m;
 }
-/* context organs, always faint */
-(function(){
-  var sm=pm(0xe6dcc4,{r:0.6,cc:0.1});
-  for(var i=0;i<17;i++){
-    var m=new T.Mesh(new T.CylinderGeometry(0.14*S,0.14*S,0.17*S,14),sm);
-    var sp=W([0,3.3+i*0.28,-0.5+Math.sin(i/16*Math.PI)*0.06]);
-    m.position.set(sp[0],sp[1],sp[2]);
-    world.add(m);
-  }
-  sm.opacity=0.55;organs.push({m:null,mat:sm,stops:[],foc:0.55,fixed:0.55});
-})();
 function lung(s){
   return blobGeo(function(x,y,z){return [x*0.5*(1-0.25*Math.max(0,y))+s*0.04*y,y*1.1,z*0.5];});
 }
@@ -716,7 +732,7 @@ function setCard(n){
     k.textContent='Urinary system';
     t.textContent='ตามหยดน้ำหนึ่งหยด';
     b.textContent='ติดตามน้ำที่ดื่มตั้งแต่ถูกกลืนลงไป จนออกจากร่างกายเป็นปัสสาวะ กล้องจะหยุดที่แต่ละอวัยวะพร้อมคำอธิบาย';
-    f.textContent='ทั้งหมด '+N+' ขั้น · ใช้ปุ่มลูกศรซ้ายขวาบนคีย์บอร์ดได้';
+    f.textContent='';
   }else{
     var s=STOPS[n];
     k.textContent=(n===N-1?'สรุป':'ขั้นที่ '+(n+1)+' จาก '+N)+' · '+s.en;
@@ -1119,6 +1135,16 @@ window.addEventListener('keydown',function(e){
   else if(e.key>='1'&&e.key<='4'&&!answered&&!elMain.hidden)pick(+e.key-1);
   else if((e.key==='ArrowRight'||e.key==='Enter')&&answered&&!elMain.hidden){e.preventDefault();next();}
 },true);
+})();
+
+(function(){
+var m=document.getElementById('mem'),o=document.getElementById('memOpen'),c=document.getElementById('memClose');
+if(!m||!o)return;
+function open(){m.hidden=false;try{c.focus({preventScroll:true});}catch(e){}}
+function close(){m.hidden=true;}
+o.addEventListener('click',open);c.addEventListener('click',close);
+m.addEventListener('click',function(e){if(e.target===m)close();});
+window.addEventListener('keydown',function(e){if(!m.hidden){e.stopPropagation();if(e.key==='Escape')close();}},true);
 })();
 </script>
 

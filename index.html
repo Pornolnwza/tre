@@ -99,8 +99,10 @@ body{
 body.rec .rec-exit{display:block}
 .rec-next{display:none;position:fixed;right:max(14px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);z-index:6;width:56px;height:56px;padding:0;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.6);color:var(--ink);opacity:.6;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .rec-next:active{opacity:1}
+.rec-prev{right:auto;left:max(14px,env(safe-area-inset-left,0px))}
 body.rec .rec-next{display:flex}
 body.rec .rec-next:hover{opacity:1}
+body.rec .rec-prev:disabled{opacity:.2;cursor:default}
 @media (hover:none) and (pointer:coarse){
 }
 
@@ -114,8 +116,8 @@ body.rec .rec-next:hover{opacity:1}
 .mem-in .sub{font:400 12px var(--f-mono);color:#9aa7b0;margin:0 0 14px}
 .mem-in ul{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-direction:column;gap:8px}
 .mem-in li{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-radius:10px;background:#242a2f;font-size:22px}
-.mem-in li span{font:500 13px var(--f-mono);color:#4db3e6;white-space:nowrap}
 .mem-in .qbtn{display:block;margin-left:auto;min-height:36px;padding:6px 16px;font-size:14px;border-radius:8px}
+.mem-in li span{font:500 22px var(--f-mono);color:#4db3e6;white-space:nowrap}
 .quiz [hidden],.quiz[hidden]{display:none!important}
 #qMain{display:flex;flex-direction:column;gap:18px}
 .quiz{position:fixed;inset:0;z-index:9;overflow-y:auto;background:radial-gradient(110% 85% at 50% 20%,#262a30 0%,#14171a 60%,#0d0f12 100%);color:#e8eef2;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 32px max(16px,env(safe-area-inset-left,0px))}
@@ -216,6 +218,7 @@ body.rec .rec-exit{cursor:pointer}
     </div>
   </section>
 </div>
+<button id="recPrev" class="rec-next rec-prev" type="button" aria-label="ขั้นตอนก่อนหน้า"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
 <button id="recNext" class="rec-next" type="button" aria-label="ขั้นตอนต่อไป"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
 <button id="recExit" class="rec-exit" type="button" aria-label="ออกจากโหมดอัดวิดีโอ">ออก (Esc)</button>
 <div id="mem" class="mem" hidden role="dialog" aria-label="สมาชิก"><div class="mem-in"><h2>สมาชิก</h2><p class="sub">ชั้น ม.5/12</p><ul><li>นายกิตติ์ธนทัต คงถนอม<span>เลขที่ 1</span></li><li>นายชนะชัย แสงลี<span>เลขที่ 3</span></li><li>นายชิณณพัฒน์ ภักดีเจริญ<span>เลขที่ 4</span></li><li>นายญาณวุฒิ บุญยงค์<span>เลขที่ 5</span></li><li>นายนรวัฒน์ ทองเหลือง<span>เลขที่ 10</span></li></ul><button id="memClose" class="qbtn" type="button">ปิด</button></div></div>
@@ -759,6 +762,7 @@ function syncUI(){
     b.classList.toggle('done',i<focus);
   });
   btnPrev.disabled=!!st.mv||st.cur<=-1;
+  if(typeof btnRecPrev!=='undefined'&&btnRecPrev)btnRecPrev.disabled=btnPrev.disabled;
   btnNext.disabled=!!st.mv;
   btnNext.textContent=st.cur===-1?'เริ่มเดินทาง':(st.cur===N-1?'เริ่มใหม่':'ถัดไป');
   btnAuto.textContent=st.auto?'หยุดอัตโนมัติ':'เล่นอัตโนมัติ';
@@ -851,7 +855,7 @@ window.addEventListener('keydown',function(e){
 var px=0,py=0,tx=0,ty=0;
 
 /* recording mode: only the body and the card stay on screen, and the tour plays from the start */
-var btnRec=$('rec'),btnRecExit=$('recExit'),btnRecNext=$('recNext'),recFlag=false,recT=0;
+var btnRec=$('rec'),btnRecExit=$('recExit'),btnRecNext=$('recNext'),btnRecPrev=$('recPrev'),recFlag=false,recT=0;
 function fsEnter(){
   try{var el=document.documentElement;if(el&&el.requestFullscreen){var p=el.requestFullscreen();if(p&&p.catch)p.catch(function(){});}}catch(e){}
 }
@@ -864,13 +868,13 @@ function recStart(){
   if(st.mv){recT=setTimeout(recStart,400);return;}
   if(st.cur!==-1){go(-1);recT=setTimeout(recStart,400);return;}
   recT=setTimeout(function(){
-    if(recFlag&&st.cur===-1&&!st.mv){st.auto=true;syncUI();advance();}
+    if(recFlag&&st.cur===-1&&!st.mv){st.auto=false;syncUI();}
   },2500);
 }
 function recOn(){
   if(recFlag)return;
   recFlag=true;document.body.classList.add('rec');
-  tx=0;ty=0;st.auto=true;syncUI();
+  tx=0;ty=0;st.auto=false;syncUI();
   fsEnter();
   recT=setTimeout(recStart,600);
 }
@@ -883,6 +887,7 @@ function recOff(){
 btnRec.addEventListener('click',recOn);
 btnRecExit.addEventListener('click',recOff);
 btnRecNext.addEventListener('click',function(){advance();});
+btnRecPrev.addEventListener('click',function(){if(!btnPrev.disabled)btnPrev.click();});
 if(document.addEventListener)document.addEventListener('fullscreenchange',function(){
   if(recFlag&&!document.fullscreenElement)recOff();
 });
